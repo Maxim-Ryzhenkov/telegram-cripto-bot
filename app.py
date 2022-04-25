@@ -5,6 +5,7 @@ import telebot
 import config
 from currencies import Currency
 from extensions import UserRequest
+from extensions import ApiException
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -23,10 +24,10 @@ def handler_menu_help(message):
 @bot.message_handler(commands=['all_values', ])
 def handler_all_values(message):
     """ Обработчик команды '/all_values' выведет полный список доступных валют. """
-    bot.reply_to(message, text=f"Все доступные валюты:\n"
-                               f"{Currency.printable_string()}\n"
-                               f"...\n"
-                               f"Формат запроса /how_to_convert")
+    bot.send_message(message.chat.id, text=f"Все доступные валюты:\n"
+                                           f"{Currency.printable_string()}\n"
+                                           f"...\n"
+                                           f"Формат запроса /how_to_convert")
 
 
 @bot.message_handler(commands=['major_values', ])
@@ -55,19 +56,18 @@ def handler_major_values(message):
 @bot.message_handler()
 def request_handler(message):
     """ Обработчик запроса на конвертацию. """
-    user_message = UserRequest(message)
-    if not user_message.errors:
+    try:
+        user_message = UserRequest(message)
+    except ValueError as e:
+        bot.send_message(message.chat.id, text=f"{e}")
+    except ApiException as e:
+        bot.send_message(message.chat.id, text=f"{e}")
+    else:
         bot.send_message(message.chat.id,
                          text=f"{user_message.amount} "
                               f"{user_message.from_currency.correct_print_name(user_message.amount)} = "
                               f"{user_message.result} "
                               f"{user_message.to_currency.correct_print_name(user_message.result)}")
-    else:
-        for error in user_message.errors:
-            bot.reply_to(message, text=f"{error}")
-        bot.send_message(chat_id=message.chat.id, text=f"Формат запроса /how_to_convert\n"
-                                                       f"Названия основных валют /major_values\n"
-                                                       f"Посмотреть полный список валют /all_values")
 
 
 bot.polling(none_stop=True)

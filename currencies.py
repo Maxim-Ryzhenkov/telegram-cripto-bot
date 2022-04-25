@@ -23,7 +23,7 @@ class CurrencyEnum(enum.Enum):
             if name.lower() == currency.name.lower() or name.lower() in (v.lower() for v in currency.value):
                 print(f"{name} ищу в {currency.name} и в {currency.value}")
                 return currency
-        return None
+        raise ValueError(f"Не удалось найти '{name}' в списке валют. /all_values")
 
 
 class Currency(CurrencyEnum):
