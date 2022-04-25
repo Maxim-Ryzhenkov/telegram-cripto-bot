@@ -12,10 +12,7 @@ bot = telebot.TeleBot(config.TOKEN)
 @bot.message_handler(commands=['help', 'start'])
 def handler_menu_help(message):
     """ Обработать сообщения, содержащие команды '/start' или '/help'. """
-    if message.chat.username == "Maxim_Ryzhenkov":
-        text = f"Слушаю и повинуюсь, автор {message.chat.first_name}. Приказывай."
-    else:
-        text = f"Привет, {message.chat.first_name}."
+    text = f"Привет, {message.chat.first_name}."
     text = f"{text}\nЯ умею конвертировать одну валюту в другую, по актуальному курсу."
     bot.reply_to(message=message, text=text)
     bot.send_message(chat_id=message.chat.id, text=f"Формат запроса /how_to_convert\n"
