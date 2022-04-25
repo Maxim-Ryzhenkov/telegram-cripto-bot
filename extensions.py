@@ -27,17 +27,25 @@ class UserRequest:
             amount, from_currency, to_currency = result.groups()
         except AttributeError:
             raise ValueError("Неправильный формат запроса.\n"
-                             "Пример правильного ввода /how_to_convert\n"
+                             "Пример правильного ввода /command_format\n"
                              "Названия валют /all_values")
         print(f"amount={amount}, from_currency={from_currency}, to_currency={to_currency}")
-        amount = float(amount.replace(",", "."))
+        amount = UserRequest.verify_amount(amount)
+        from_currency = Currency.detect(from_currency)
+        to_currency = Currency.detect(to_currency)
+        return from_currency, to_currency, amount
+
+    @staticmethod
+    def verify_amount(value):
+        try:
+            amount = float(value.replace(",", "."))
+        except ValueError:
+            raise ValueError("Сумма должна быть числом.")
         if amount <= 0:
             raise ValueError("Сумма должна быть больше нуля.")
         if amount > 9999999999:
             raise ValueError("Число суммы не должна превышать 9999999999.")
-        from_currency = Currency.detect(from_currency)
-        to_currency = Currency.detect(to_currency)
-        return from_currency, to_currency, amount
+        return amount
 
     @staticmethod
     def get_price(from_currency: Currency, to_currency: Currency, amount: float) -> float:
