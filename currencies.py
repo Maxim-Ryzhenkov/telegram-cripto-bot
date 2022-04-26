@@ -77,7 +77,7 @@ class Currency(CurrencyEnum):
         """ Получить корректное название в зависимости от количества. """
         if amount == 1:
             return self.name_one
-        elif 0 < amount < 1 or 2 <= amount < 5:
+        elif 0 < amount < 1 or 1 < amount < 5:
             return self.name_few
         elif amount >= 5:
             return self.name_many
